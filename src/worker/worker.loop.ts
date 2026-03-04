@@ -1,6 +1,7 @@
 import { pool } from "../config/database";
 import { config } from "../config/env";
 import { sleep } from "../utils/sleep";
+import { executeAction } from "./actions.processor";
 
 export async function startWorker() {
   console.log("Worker started...");
@@ -68,11 +69,32 @@ async function processNextJob() {
 }
 
 async function executeJob(job: any) {
-  try {
-    // 1. Process action (we’ll implement later)
-    const processedPayload = job.payload;
 
-    // 2. Deliver to subscribers (we implement later)
+  try {
+
+    const pipelineResult = await pool.query(
+      `
+      SELECT actions
+      FROM pipelines
+      WHERE id = $1
+      AND deleted_at IS NULL
+      `,
+      [job.pipeline_id]
+    );
+
+    if (!pipelineResult.rows[0]) {
+      throw new Error("Pipeline not found");
+    }
+
+    let payload = job.payload;
+
+    const actions = pipelineResult.rows[0].actions.sequence;
+
+    for (const action of actions) {
+      payload = executeAction(action, payload);
+    }
+
+    // Deliver to subscribers (next step)
 
     await pool.query(
       `
@@ -84,7 +106,8 @@ async function executeJob(job: any) {
       [job.id]
     );
 
-  } catch (err) {
+  } catch (error) {
+
     await pool.query(
       `
       UPDATE jobs
@@ -93,5 +116,6 @@ async function executeJob(job: any) {
       `,
       [job.id]
     );
+
   }
 }

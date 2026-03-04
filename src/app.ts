@@ -2,6 +2,7 @@ import express from "express";
 
 import pipelineRoutes from "./modules/pipelines/pipeline.routes";
 import subscriberRoutes from "./modules/subscribers/subscriber.routes";
+import webhookRoutes from "./modules/webhooks/webhook.routes";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(express.json());
 
 app.use("/api", pipelineRoutes);
 app.use("/api", subscriberRoutes);
+app.use("/api", webhookRoutes);
 
 /*
 |--------------------------------------------------------------------------
