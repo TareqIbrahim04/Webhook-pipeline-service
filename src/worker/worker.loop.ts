@@ -2,6 +2,9 @@ import { pool } from "../config/database";
 import { config } from "../config/env";
 import { sleep } from "../utils/sleep";
 import { executeAction } from "./actions.processor";
+import { DeliveryService } from "../modules/deliveries/delivery.service";
+
+const deliveryService = new DeliveryService();
 
 export async function startWorker() {
   console.log("Worker started...");
@@ -94,7 +97,11 @@ async function executeJob(job: any) {
       payload = executeAction(action, payload);
     }
 
-    // Deliver to subscribers (next step)
+    await deliveryService.deliver(
+      job.id,
+      job.pipeline_id,
+      payload
+    );
 
     await pool.query(
       `
@@ -107,7 +114,8 @@ async function executeJob(job: any) {
     );
 
   } catch (error) {
-
+    
+    // Only fail if ACTION PROCESSING crashes
     await pool.query(
       `
       UPDATE jobs
