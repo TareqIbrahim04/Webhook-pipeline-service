@@ -75,3 +75,12 @@ CREATE TABLE delivery_attempts (
 
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+ALTER TABLE delivery_attempts
+ADD COLUMN next_retry_at TIMESTAMP,
+ADD COLUMN retry_count INT DEFAULT 0,
+ADD COLUMN updated_at TIMESTAMP DEFAULT NOW();
+
+
+ALTER TABLE delivery_attempts
+DROP COLUMN attempt_number;
