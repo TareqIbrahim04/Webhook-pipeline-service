@@ -14,7 +14,7 @@ export class PipelineRepository {
       pipeline.name,
       pipeline.source_path,
       JSON.stringify(pipeline.actions),
-      null,
+      pipeline.secret,
       60
     ];
 

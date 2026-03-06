@@ -9,7 +9,8 @@ CREATE TYPE job_status AS ENUM (
 
 CREATE TYPE delivery_status AS ENUM (
     'success',
-    'failed'
+    'failed',
+    'retrying'
 );
 
 CREATE TABLE pipelines (

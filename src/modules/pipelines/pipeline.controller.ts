@@ -10,6 +10,7 @@ export async function createPipeline(req: Request, res: Response) {
     res.status(201).json(pipeline);
 
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    console.error("Create pipeline error:", error);
+    res.status(500).json({ error: "controller error" });
   }
 }

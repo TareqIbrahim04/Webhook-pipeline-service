@@ -3,6 +3,7 @@ import { config } from "../config/env";
 import { sleep } from "../utils/sleep";
 import { executeAction } from "./actions.processor";
 import { DeliveryService } from "../modules/deliveries/delivery.service";
+import { retryLoop } from "./retry.loop";
 
 const deliveryService = new DeliveryService();
 
@@ -17,7 +18,7 @@ export async function startWorker() {
     }
 
     // small delay to avoid tight loop
-    await sleep(1000);
+    await sleep(5000);
   }
 }
 
@@ -43,6 +44,7 @@ async function processNextJob() {
 
     if (result.rows.length === 0) {
       await client.query("COMMIT");
+      console.log("No pending jobs found, waiting...");
       return;
     }
 
@@ -74,7 +76,7 @@ async function processNextJob() {
 async function executeJob(job: any) {
 
   try {
-
+    console.log("Processing job:", job.id);
     const pipelineResult = await pool.query(
       `
       SELECT actions
@@ -103,6 +105,8 @@ async function executeJob(job: any) {
       payload
     );
 
+    retryLoop();
+    
     await pool.query(
       `
       UPDATE jobs
@@ -113,8 +117,10 @@ async function executeJob(job: any) {
       [job.id]
     );
 
+    console.log("Job completed:", job.id);
+
   } catch (error) {
-    
+    console.error("Error processing job:", job.id, error);
     // Only fail if ACTION PROCESSING crashes
     await pool.query(
       `

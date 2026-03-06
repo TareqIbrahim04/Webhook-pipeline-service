@@ -14,14 +14,16 @@ export class DeliveryRepository {
     await pool.query(
       `
       INSERT INTO delivery_attempts
-      (job_id, subscriber_url, status, response_code)
-      VALUES ($1,$2,$3,$4)
+      (job_id, subscriber_url, status, response_code, next_retry_at, retry_count)
+      VALUES ($1,$2,$3,$4,$5,$6)
       `,
       [
         data.jobId,
         data.subscriberUrl,
         data.status,
-        data.responseCode
+        data.responseCode,
+        data.nextRetryAt,
+        data.retryCount
       ]
     );
   }

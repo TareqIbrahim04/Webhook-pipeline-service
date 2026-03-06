@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { receiveWebhook } from "./webhook.controller";
+import { signatureMiddleware } from "../../middleware/signature.middleware";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ const router = Router();
 
 router.post(
   "/webhooks/:pipelineId",
+  signatureMiddleware,
   receiveWebhook
 );
 

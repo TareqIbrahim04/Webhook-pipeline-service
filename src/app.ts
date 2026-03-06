@@ -12,7 +12,13 @@ const app = express();
 |--------------------------------------------------------------------------
 */
 
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req: any, res, buf) => {
+      req.rawBody = buf.toString(); // to save the raw body for generating and verify signiture
+    }
+  })
+);
 
 /*
 |--------------------------------------------------------------------------
