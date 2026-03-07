@@ -29,11 +29,11 @@ export class DeliveryRepository {
   }
 
   async markSuccess(
-  attemptId: string,
-  responseCode: number
-) {
-  await pool.query(
-    `
+    attemptId: string,
+    responseCode: number
+  ) {
+    await pool.query(
+      `
     UPDATE delivery_attempts
     SET status = 'success',
         response_code = $1,
@@ -41,30 +41,30 @@ export class DeliveryRepository {
         updated_at = NOW()
     WHERE id = $2
     `,
-    [responseCode, attemptId]
-  );
-}
+      [responseCode, attemptId]
+    );
+  }
 
-async markFailed(attemptId: string) {
-  await pool.query(
-    `
+  async markFailed(attemptId: string) {
+    await pool.query(
+      `
     UPDATE delivery_attempts
     SET status = 'failed',
         next_retry_at = NULL,
         updated_at = NOW()
     WHERE id = $1
     `,
-    [attemptId]
-  );
-}
+      [attemptId]
+    );
+  }
 
-async rescheduleRetry(
-  attemptId: string,
-  newRetryCount: number,
-  nextRetryAt: Date
-) {
-  await pool.query(
-    `
+  async rescheduleRetry(
+    attemptId: string,
+    newRetryCount: number,
+    nextRetryAt: Date
+  ) {
+    await pool.query(
+      `
     UPDATE delivery_attempts
     SET retry_count = $1,
         next_retry_at = $2,
@@ -72,8 +72,18 @@ async rescheduleRetry(
         updated_at = NOW()
     WHERE id = $3
     `,
-    [newRetryCount, nextRetryAt, attemptId]
-  );
-}
+      [newRetryCount, nextRetryAt, attemptId]
+    );
+  }
+
+  async findAll() {
+    const result = await pool.query(`
+      SELECT id, job_id, subscriber_url, status, created_at
+      FROM deliveries
+      ORDER BY created_at DESC
+    `);
+
+    return result.rows;
+  }
 }
 

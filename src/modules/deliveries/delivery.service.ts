@@ -121,4 +121,8 @@ async retry(attempt: any) {
     );
   }
 }
+
+  async getAllDeliveries() {
+    return this.repo.findAll();
+  }
 }
