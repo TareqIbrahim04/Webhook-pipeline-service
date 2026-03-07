@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { createPipeline } from "./pipeline.controller";
+import {
+  createPipeline,
+  getPipelines,
+  getPipeline,
+  updatePipeline,
+  deletePipeline
+} from "./pipeline.controller";
 
 const router = Router();
 
@@ -8,10 +14,14 @@ const router = Router();
 | Pipeline Routes
 |--------------------------------------------------------------------------
 | POST /pipelines → Create pipeline
-| GET /pipelines/:id → Get pipeline
-| DELETE /pipelines/:id → Soft delete pipeline
+| GET /pipelines/:pipelineId → Get pipeline
+| DELETE /pipelines/:pipelineId → Soft delete pipeline
 */
 
 router.post("/pipelines", createPipeline);
+router.get("/pipelines/", getPipelines);
+router.get("/pipelines/:pipelineId", getPipeline);
+router.put("/pipelines/:pipelineId", updatePipeline);
+router.delete("/pipelines/:pipelineId", deletePipeline);
 
 export default router;

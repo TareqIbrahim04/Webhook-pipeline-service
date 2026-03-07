@@ -22,4 +22,60 @@ export class PipelineRepository {
 
     return result.rows[0];
   }
+
+  async getPipelines() {
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM pipelines
+      ORDER BY created_at DESC
+      `
+    );
+
+    return result.rows;
+  }
+
+  async getPipeline(id: string) {
+    const result = await pool.query(
+      `
+      SELECT *
+      FROM pipelines
+      WHERE id = $1
+      `,
+      [id]
+    );
+
+    return result.rows[0];
+  }
+
+   async updatePipeline(id: string, data: any) {
+    const { subscribers } = data;
+
+    const result = await pool.query(
+      `
+      UPDATE pipelines
+      SET subscribers = $1
+      WHERE id = $2
+      RETURNING *
+      `,
+      [subscribers, id]
+    );
+
+    return result.rows[0];
+  }
+
+  async deletePipeline(id: string) {
+    const result = await pool.query(
+      `
+      DELETE FROM pipelines
+      WHERE id = $1
+      RETURNING id
+      `,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      throw new Error("pipeline not found");
+    }
+  }
 }

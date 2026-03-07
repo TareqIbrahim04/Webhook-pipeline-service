@@ -26,5 +26,20 @@ export class PipelineService {
     return this.repo.createPipeline(pipeline);
   }
 
+  async getPipelines() {
+    return this.repo.getPipelines();
+  }
+
+  async getPipeline(id: string) {
+    return this.repo.getPipeline(id);
+  }
+
+  async updatePipeline(id: string, data: any) {
+    return this.repo.updatePipeline(id, data);
+  }
+
+  async deletePipeline(id: string) {
+    return this.repo.deletePipeline(id);
+  }
   
 }
