@@ -27,16 +27,41 @@ export class PipelineService {
   }
 
   async getPipelines() {
-    return this.repo.getPipelines();
+    const result = await this.repo.getPipelines();
+
+    if (result.length === 0) {
+      throw new Error("No pipelines found");
+    }
+
+    return result;
   }
 
   async getPipeline(id: string) {
-    return this.repo.getPipeline(id);
+    const result = await this.repo.getPipeline(id);
+
+    if (result.length === 0) {
+      throw new Error("Pipeline not found");
+    }
+
+    return result;
   }
 
   async updatePipeline(id: string, data: any) {
-    return this.repo.updatePipeline(id, data);
+    const existingPipeline = await this.repo.getPipeline(id);
+
+    if (existingPipeline.length === 0) {
+      throw new Error("Pipeline not found");
+    }
+
+    const result = await this.repo.updatePipeline(id, data);
+
+    if (result.length === 0) {
+      throw new Error("Failed to update pipeline");
+    }
+
+    return result;
   }
+
 
   async deletePipeline(id: string) {
     return this.repo.deletePipeline(id);

@@ -28,33 +28,53 @@ async function processNextJob() {
   try {
     await client.query("BEGIN");
 
-    const result = await client.query(
+    // 1. Fetch the next available job
+    const jobResult = await client.query(
       `
-      SELECT *
-      FROM jobs
+      SELECT * FROM jobs
       WHERE status = 'pending'
-         OR (
-              status = 'processing'
-              AND locked_at < NOW() - INTERVAL '${config.jobTimeoutSeconds} seconds'
-            )
+         OR (status = 'processing' AND locked_at < NOW() - INTERVAL '${config.jobTimeoutSeconds} seconds')
       FOR UPDATE SKIP LOCKED
       LIMIT 1
       `
     );
 
-    if (result.rows.length === 0) {
-      await client.query("COMMIT");
-      console.log("No pending jobs found, waiting...");
+    if (jobResult.rows.length === 0) {
+      await client.query("ROLLBACK"); 
+      console.log("No jobs available for processing. Waiting...");
       return;
     }
 
-    const job = result.rows[0];
+    const job = jobResult.rows[0];
+
+    const pipelineResult = await client.query(
+      `
+      SELECT id FROM pipelines 
+      WHERE id = $1 AND deleted_at IS NULL 
+      FOR SHARE
+      `,
+      [job.pipeline_id]
+    );
+
+    if (pipelineResult.rowCount === 0) {
+      await client.query(
+        `
+        UPDATE jobs 
+        SET status = 'cancelled' 
+        WHERE id = $1
+        `,
+        [job.id]
+      );
+      await client.query("COMMIT");
+      console.log(`Job ${job.id} cancelled because parent pipeline was deleted.`);
+      return;
+    }
 
     await client.query(
       `
-      UPDATE jobs
-      SET status = 'processing',
-          locked_at = NOW()
+      UPDATE jobs 
+      SET status = 'processing', 
+      locked_at = NOW() 
       WHERE id = $1
       `,
       [job.id]
@@ -62,12 +82,11 @@ async function processNextJob() {
 
     await client.query("COMMIT");
 
-    // Process outside transaction
     await executeJob(job);
 
   } catch (err) {
     await client.query("ROLLBACK");
-    throw err;
+    console.error("Worker error:", err);
   } finally {
     client.release();
   }

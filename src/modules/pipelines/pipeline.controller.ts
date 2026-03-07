@@ -71,7 +71,7 @@ export async function deletePipeline(req: Request, res: Response) {
 
     res.json({ message: "pipeline deleted" });
 
-  } catch {
+  }catch (error: any) {
     res.status(404).json({ error: "pipeline not found" });
   }
 }

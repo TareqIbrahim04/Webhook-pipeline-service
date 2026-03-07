@@ -4,7 +4,8 @@ CREATE TYPE job_status AS ENUM (
     'pending',
     'processing',
     'completed',
-    'failed'
+    'failed',
+    'cancelled'
 );
 
 CREATE TYPE delivery_status AS ENUM (

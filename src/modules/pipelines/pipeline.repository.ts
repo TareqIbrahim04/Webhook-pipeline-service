@@ -28,6 +28,7 @@ export class PipelineRepository {
       `
       SELECT *
       FROM pipelines
+      Where deleted_at IS NULL
       ORDER BY created_at DESC
       `
     );
@@ -40,6 +41,7 @@ export class PipelineRepository {
       `
       SELECT *
       FROM pipelines
+      Where deleted_at IS NULL
       WHERE id = $1
       `,
       [id]
@@ -53,9 +55,9 @@ export class PipelineRepository {
 
     const result = await pool.query(
       `
-      UPDATE pipelines
+      UPDATE pipeline_subscribers
       SET subscribers = $1
-      WHERE id = $2
+      WHERE id = $2 AND deleted_at IS NULL
       RETURNING *
       `,
       [subscribers, id]
@@ -65,17 +67,41 @@ export class PipelineRepository {
   }
 
   async deletePipeline(id: string) {
-    const result = await pool.query(
-      `
-      DELETE FROM pipelines
-      WHERE id = $1
-      RETURNING id
-      `,
+
+  try {
+    await pool.query('BEGIN');
+    // Lock the pipeline row and verify it exists/isn't already deleted
+    const lockResult = await pool.query(
+      `SELECT id FROM pipelines WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
       [id]
     );
 
-    if (result.rowCount === 0) {
-      throw new Error("pipeline not found");
+    if (lockResult.rowCount === 0) {
+      await pool.query('ROLLBACK');
+      throw new Error("Pipeline not found or already deleted");
     }
-  }
+
+    await pool.query(
+      `UPDATE pipelines SET deleted_at = NOW() WHERE id = $1`,
+      [id]
+    );
+
+    await pool.query(
+      `UPDATE pipeline_subscribers SET deleted_at = NOW() 
+       WHERE pipeline_id = $1 AND deleted_at IS NULL`,
+      [id]
+    );
+    
+    await pool.query(
+      `UPDATE jobs SET status = 'cancelled' 
+      WHERE pipeline_id = $1 AND status = 'pending'`,
+      [id]
+    );
+    
+    await pool.query('COMMIT');
+  } catch (error) {
+      await pool.query('ROLLBACK');
+      throw error;
+  } 
+}
 }
