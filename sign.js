@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 
-const secret = "aab343148f3ba246665df31545b6349dfd5a094dd2e9d4ac7c22423cf389eecb";
+const secret = "1f0eff17ecc6fcc81e803b287aa406a51d41e10345cc4ad7cf9f99218f844383";
 
 const payload = JSON.stringify({"message":"hello world"}); 
 // should exactly match the payload sent by the webhook sender (frontend)
