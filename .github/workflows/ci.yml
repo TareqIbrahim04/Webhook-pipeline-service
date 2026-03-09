@@ -47,6 +47,13 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Setup database schema
+        run: |
+          sudo apt-get install -y postgresql-client
+          psql -h localhost -U postgres -d webhook_pipeline -f sql/init.sql
+        env:
+          PGPASSWORD: postgres
+
       - name: Lint
         run: npm run lint
 
