@@ -468,6 +468,5 @@ Possible enhancements:
 
 ---
 
-# License
-
-MIT
+# Contact me:
+email: tareq.ibra.04@gmail.com
