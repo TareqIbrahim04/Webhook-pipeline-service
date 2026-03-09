@@ -1,6 +1,12 @@
 // jobs.routes.ts
 import { Router } from "express";
-import { getJob, getJobs, getJobsByPipeline, getJobAttempts, getJobHistory } from "./job.controller";
+import {
+  getJob,
+  getJobs,
+  getJobsByPipeline,
+  getJobAttempts,
+  getJobHistory,
+} from "./job.controller";
 
 const router = Router();
 

@@ -11,10 +11,6 @@ const router = Router();
 | POST /api/webhooks/:pipelineId
 */
 
-router.post(
-  "/webhooks/:pipelineId",
-  signatureMiddleware,
-  receiveWebhook
-);
+router.post("/webhooks/:pipelineId", signatureMiddleware, receiveWebhook);
 
 export default router;

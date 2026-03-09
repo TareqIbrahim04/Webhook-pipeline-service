@@ -5,7 +5,6 @@ export class SubscriberService {
   private repo = new SubscriberRepository();
 
   async createSubscriber(pipelineId: string, url: string) {
-
     // Check pipeline exists
     const pipelineCheck = await pool.query(
       "SELECT id FROM pipelines WHERE id = $1 AND deleted_at IS NULL",

@@ -2,11 +2,9 @@ import { randomUUID } from "crypto";
 import { WebhookRepository } from "./webhook.repository";
 
 export class WebhookService {
-
   private repo = new WebhookRepository();
 
   async receiveWebhook(pipelineId: string, payload: any) {
-
     const pipeline = await this.repo.findPipelineById(pipelineId);
 
     if (!pipeline) {
@@ -18,12 +16,12 @@ export class WebhookService {
     await this.repo.createJob({
       id: jobId,
       pipelineId,
-      payload
+      payload,
     });
 
     return {
       jobId,
-      status: "queued"
+      status: "queued",
     };
   }
 }

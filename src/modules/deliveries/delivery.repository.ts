@@ -1,7 +1,6 @@
 import { pool } from "../../config/database";
 
 export class DeliveryRepository {
-
   async createAttempt(data: {
     jobId: string;
     subscriberUrl: string;
@@ -10,7 +9,6 @@ export class DeliveryRepository {
     nextRetryAt?: Date;
     retryCount: number;
   }) {
-
     await pool.query(
       `
       INSERT INTO delivery_attempts
@@ -23,15 +21,12 @@ export class DeliveryRepository {
         data.status,
         data.responseCode,
         data.nextRetryAt,
-        data.retryCount
+        data.retryCount,
       ]
     );
   }
 
-  async markSuccess(
-    attemptId: string,
-    responseCode: number
-  ) {
+  async markSuccess(attemptId: string, responseCode: number) {
     await pool.query(
       `
     UPDATE delivery_attempts
@@ -86,4 +81,3 @@ export class DeliveryRepository {
     return result.rows;
   }
 }
-

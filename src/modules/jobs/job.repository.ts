@@ -1,7 +1,6 @@
 import { pool } from "../../config/database";
 
 export class JobsRepository {
-
   async findById(jobId: string) {
     const result = await pool.query(
       `SELECT id, pipeline_id, status, created_at

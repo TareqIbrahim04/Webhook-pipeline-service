@@ -2,25 +2,23 @@ import { config } from "../../config/env";
 import { MetricsRepository } from "./metrics.repository";
 
 export class MetricsService {
-
   private repo = new MetricsRepository();
 
   async getMetrics() {
-
     const [
       jobsTotal,
       jobsCompleted,
       jobsFailed,
       deliveryAttempts,
       retryQueueSize,
-      pipelinesTotal
+      pipelinesTotal,
     ] = await Promise.all([
       this.repo.getJobsTotal(),
       this.repo.getJobsCompleted(),
       this.repo.getJobsFailed(),
       this.repo.getDeliveryAttempts(),
       this.repo.getRetryQueueSize(),
-      this.repo.getPipelinesTotal()
+      this.repo.getPipelinesTotal(),
     ]);
 
     return {
@@ -31,7 +29,7 @@ export class MetricsService {
       retry_queue_size: retryQueueSize,
       pipelines_total: pipelinesTotal,
       memory_usage: config.memoryUsage,
-      uptime_seconds: config.uptimeSeconds
+      uptime_seconds: config.uptimeSeconds,
     };
   }
 }

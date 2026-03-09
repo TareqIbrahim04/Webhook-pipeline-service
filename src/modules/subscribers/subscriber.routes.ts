@@ -10,9 +10,6 @@ const router = Router();
 | POST /api/pipelines/:pipelineId/subscribers
 */
 
-router.post(
-  "/pipelines/:pipelineId/subscribers",
-  createSubscriber
-);
+router.post("/pipelines/:pipelineId/subscribers", createSubscriber);
 
 export default router;

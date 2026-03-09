@@ -1,7 +1,5 @@
 export function executeAction(actionName: string, payload: any) {
-
   switch (actionName) {
-
     case "uppercase":
       if (payload.message) {
         payload.message = payload.message.toUpperCase();

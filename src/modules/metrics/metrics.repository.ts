@@ -1,7 +1,6 @@
 import { pool } from "../../config/database";
 
 export class MetricsRepository {
-
   async getJobsTotal() {
     const result = await pool.query(`
       SELECT COUNT(*) FROM jobs

@@ -24,5 +24,5 @@ export const config = {
   maxRetries: Number(process.env.MAX_RETRIES || 3),
   jobTimeoutSeconds: Number(process.env.JOB_TIMEOUT_SECONDS || 60),
   memoryUsage: process.memoryUsage(),
-  uptimeSeconds: process.uptime()
+  uptimeSeconds: process.uptime(),
 };

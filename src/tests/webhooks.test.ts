@@ -4,92 +4,81 @@ import app from "../app";
 import { pool } from "../config/database";
 
 describe("Webhook API", () => {
+  let pipelineId: string;
+  let secret: string;
 
-    let pipelineId: string;
-    let secret: string;
+  beforeAll(async () => {
+    pipelineId = "11111111-1111-1111-1111-111111111111";
+    secret = "test-secret";
 
-    beforeAll(async () => {
-
-        pipelineId = "11111111-1111-1111-1111-111111111111";
-        secret = "test-secret";
-
-        await pool.query(`
+    await pool.query(
+      `
     INSERT INTO pipelines (id, name, source_path, actions, secret)
     VALUES ($1,'test','/webhooks/test','{}',$2)
     ON CONFLICT (id) DO NOTHING
-  `, [pipelineId, secret]);
+  `,
+      [pipelineId, secret]
+    );
+  });
 
-    });
+  afterAll(async () => {
+    await pool.query("DELETE FROM delivery_attempts");
+    await pool.query("DELETE FROM jobs");
+    await pool.query("DELETE FROM pipeline_subscribers");
+    await pool.query("DELETE FROM pipelines");
 
-    afterAll(async () => {
+    await pool.end();
+  });
 
-        await pool.query("DELETE FROM delivery_attempts");
-        await pool.query("DELETE FROM jobs");
-        await pool.query("DELETE FROM pipeline_subscribers");
-        await pool.query("DELETE FROM pipelines");
+  test("should accept webhook and create job", async () => {
+    const payload = { event: "user.created" };
 
-        await pool.end();
+    const rawBody = JSON.stringify(payload);
 
-    });
+    const signature = crypto
+      .createHmac("sha256", secret)
+      .update(rawBody)
+      .digest("hex");
 
-    test("should accept webhook and create job", async () => {
+    const res = await request(app)
+      .post(`/api/webhooks/${pipelineId}`)
+      .set("X-Webhook-Signature", signature)
+      .send(payload);
 
-        const payload = { event: "user.created" };
+    expect(res.status).toBe(202);
+    expect(res.body.status).toBe("queued");
+  });
 
-        const rawBody = JSON.stringify(payload);
+  test("should fail if signature missing", async () => {
+    const res = await request(app)
+      .post(`/api/webhooks/${pipelineId}`)
+      .send({ event: "test" });
 
-        const signature = crypto
-            .createHmac("sha256", secret)
-            .update(rawBody)
-            .digest("hex");
+    expect(res.status).toBe(401);
+  });
 
-        const res = await request(app)
-            .post(`/api/webhooks/${pipelineId}`)
-            .set("X-Webhook-Signature", signature)
-            .send(payload);
+  test("should fail with invalid signature", async () => {
+    const res = await request(app)
+      .post(`/api/webhooks/${pipelineId}`)
+      .set("X-Webhook-Signature", "invalid")
+      .send({ event: "test" });
 
-        expect(res.status).toBe(202);
-        expect(res.body.status).toBe("queued");
+    expect(res.status).toBe(401);
+  });
 
-    });
+  test("should fail if pipeline not found", async () => {
+    const payload = { event: "test" };
 
-    test("should fail if signature missing", async () => {
+    const signature = crypto
+      .createHmac("sha256", "wrong-secret")
+      .update(JSON.stringify(payload))
+      .digest("hex");
 
-        const res = await request(app)
-            .post(`/api/webhooks/${pipelineId}`)
-            .send({ event: "test" });
+    const res = await request(app)
+      .post(`/api/webhooks/${pipelineId}`)
+      .set("X-Webhook-Signature", signature)
+      .send(payload);
 
-        expect(res.status).toBe(401);
-
-    });
-
-    test("should fail with invalid signature", async () => {
-
-        const res = await request(app)
-            .post(`/api/webhooks/${pipelineId}`)
-            .set("X-Webhook-Signature", "invalid")
-            .send({ event: "test" });
-
-        expect(res.status).toBe(401);
-
-    });
-
-    test("should fail if pipeline not found", async () => {
-
-        const payload = { event: "test" };
-
-        const signature = crypto
-            .createHmac("sha256", "wrong-secret")
-            .update(JSON.stringify(payload))
-            .digest("hex");
-
-        const res = await request(app)
-            .post(`/api/webhooks/${pipelineId}`)
-            .set("X-Webhook-Signature", signature)
-            .send(payload);
-
-        expect(res.status).toBe(401);
-
-    });
-
+    expect(res.status).toBe(401);
+  });
 });

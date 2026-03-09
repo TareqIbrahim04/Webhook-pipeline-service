@@ -1,7 +1,6 @@
 import { pool } from "../../config/database";
 
 export class WebhookRepository {
-
   async findPipelineById(pipelineId: string) {
     const result = await pool.query(
       `SELECT id, deleted_at
@@ -14,11 +13,7 @@ export class WebhookRepository {
     return result.rows[0];
   }
 
-  async createJob(job: {
-    id: string;
-    pipelineId: string;
-    payload: any;
-  }) {
+  async createJob(job: { id: string; pipelineId: string; payload: any }) {
     await pool.query(
       `
       INSERT INTO jobs

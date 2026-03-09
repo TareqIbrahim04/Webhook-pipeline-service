@@ -15,7 +15,7 @@ export class PipelineRepository {
       pipeline.source_path,
       JSON.stringify(pipeline.actions),
       pipeline.secret,
-      60
+      60,
     ];
 
     const result = await pool.query(query, values);
@@ -50,7 +50,7 @@ export class PipelineRepository {
     return result.rows[0];
   }
 
-   async updatePipeline(id: string, data: any) {
+  async updatePipeline(id: string, data: any) {
     const { subscribers } = data;
 
     const result = await pool.query(
@@ -67,41 +67,40 @@ export class PipelineRepository {
   }
 
   async deletePipeline(id: string) {
+    try {
+      await pool.query("BEGIN");
+      // Lock the pipeline row and verify it exists/isn't already deleted
+      const lockResult = await pool.query(
+        `SELECT id FROM pipelines WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
+        [id]
+      );
 
-  try {
-    await pool.query('BEGIN');
-    // Lock the pipeline row and verify it exists/isn't already deleted
-    const lockResult = await pool.query(
-      `SELECT id FROM pipelines WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`,
-      [id]
-    );
+      if (lockResult.rowCount === 0) {
+        await pool.query("ROLLBACK");
+        throw new Error("Pipeline not found or already deleted");
+      }
 
-    if (lockResult.rowCount === 0) {
-      await pool.query('ROLLBACK');
-      throw new Error("Pipeline not found or already deleted");
-    }
+      await pool.query(
+        `UPDATE pipelines SET deleted_at = NOW() WHERE id = $1`,
+        [id]
+      );
 
-    await pool.query(
-      `UPDATE pipelines SET deleted_at = NOW() WHERE id = $1`,
-      [id]
-    );
-
-    await pool.query(
-      `UPDATE pipeline_subscribers SET deleted_at = NOW() 
+      await pool.query(
+        `UPDATE pipeline_subscribers SET deleted_at = NOW() 
        WHERE pipeline_id = $1 AND deleted_at IS NULL`,
-      [id]
-    );
-    
-    await pool.query(
-      `UPDATE jobs SET status = 'cancelled' 
+        [id]
+      );
+
+      await pool.query(
+        `UPDATE jobs SET status = 'cancelled' 
       WHERE pipeline_id = $1 AND status = 'pending'`,
-      [id]
-    );
-    
-    await pool.query('COMMIT');
-  } catch (error) {
-      await pool.query('ROLLBACK');
+        [id]
+      );
+
+      await pool.query("COMMIT");
+    } catch (error) {
+      await pool.query("ROLLBACK");
       throw error;
-  } 
-}
+    }
+  }
 }

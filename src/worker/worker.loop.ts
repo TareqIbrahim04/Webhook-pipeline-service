@@ -40,7 +40,7 @@ async function processNextJob() {
     );
 
     if (jobResult.rows.length === 0) {
-      await client.query("ROLLBACK"); 
+      await client.query("ROLLBACK");
       console.log("No jobs available for processing. Waiting...");
       return;
     }
@@ -66,7 +66,9 @@ async function processNextJob() {
         [job.id]
       );
       await client.query("COMMIT");
-      console.log(`Job ${job.id} cancelled because parent pipeline was deleted.`);
+      console.log(
+        `Job ${job.id} cancelled because parent pipeline was deleted.`
+      );
       return;
     }
 
@@ -83,7 +85,6 @@ async function processNextJob() {
     await client.query("COMMIT");
 
     await executeJob(job);
-
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Worker error:", err);
@@ -93,7 +94,6 @@ async function processNextJob() {
 }
 
 async function executeJob(job: any) {
-
   try {
     console.log("Processing job:", job.id);
     const pipelineResult = await pool.query(
@@ -118,14 +118,10 @@ async function executeJob(job: any) {
       payload = executeAction(action, payload);
     }
 
-    await deliveryService.deliver(
-      job.id,
-      job.pipeline_id,
-      payload
-    );
+    await deliveryService.deliver(job.id, job.pipeline_id, payload);
 
     retryLoop();
-    
+
     await pool.query(
       `
       UPDATE jobs
@@ -137,7 +133,6 @@ async function executeJob(job: any) {
     );
 
     console.log("Job completed:", job.id);
-
   } catch (error) {
     console.error("Error processing job:", job.id, error);
     // Only fail if ACTION PROCESSING crashes
@@ -149,6 +144,5 @@ async function executeJob(job: any) {
       `,
       [job.id]
     );
-
   }
 }

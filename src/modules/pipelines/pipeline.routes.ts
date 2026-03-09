@@ -4,7 +4,7 @@ import {
   getPipelines,
   getPipeline,
   updatePipeline,
-  deletePipeline
+  deletePipeline,
 } from "./pipeline.controller";
 
 const router = Router();
