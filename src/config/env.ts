@@ -14,7 +14,7 @@ export const config = {
   port: Number(process.env.PORT || 3000),
 
   db: {
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || "localhost",
     port: Number(requireEnv("DB_PORT")),
     user: requireEnv("DB_USER"),
     password: requireEnv("DB_PASSWORD"),
