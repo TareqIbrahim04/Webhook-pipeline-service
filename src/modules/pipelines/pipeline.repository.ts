@@ -41,8 +41,8 @@ export class PipelineRepository {
       `
       SELECT *
       FROM pipelines
-      Where deleted_at IS NULL
-      WHERE id = $1
+      WHERE deleted_at IS NULL
+      AND id = $1
       `,
       [id]
     );
