@@ -7,7 +7,7 @@
     "test": "jest --runInBand",
     "dev": "ts-node-dev --respawn src/server.ts",
     "dev:worker": "ts-node-dev --respawn src/worker.ts",
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "start": "node dist/server.js",
     "start:worker": "node dist/worker.js",
     "lint": "eslint src --ext .ts",
