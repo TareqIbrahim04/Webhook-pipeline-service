@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "NODE_ENV=test jest --runInBand",
     "dev": "ts-node-dev --respawn src/server.ts",
     "dev:worker": "ts-node-dev --respawn src/worker.ts",
     "build": "rm -rf dist && tsc",
