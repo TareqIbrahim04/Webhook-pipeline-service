@@ -578,14 +578,28 @@ cd webhook-pipeline
 
 Create a `.env` file in the project root.
 
-Example:
+Copy these inside it:
 
 ```
-DB_HOST=postgres
+PORT=3000
+DB_HOST=db
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=postgres
 DB_NAME=webhook_pipeline
+MAX_RETRIES=3
+JOB_TIMEOUT_SECONDS=60
+```
+and for tests create a `.env.test` file in the project root.
+
+Copy these inside it:
+
+```
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=tareqziad12345
+DB_NAME=webhook_pipeline_test
 ```
 
 These values are used by the application to connect to the PostgreSQL container.
