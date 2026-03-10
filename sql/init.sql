@@ -1,6 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto"; -- for gen_random_uuid()
 
-CREATE DATABASE webhook_pipeline;
 CREATE DATABASE webhook_pipeline_test;
 
 \c webhook_pipeline;
