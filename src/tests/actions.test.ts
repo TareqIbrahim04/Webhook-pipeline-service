@@ -1,12 +1,21 @@
 import { executeAction } from "../worker/actions.processor";
 
 describe("Action Processor", () => {
-  test("should uppercase message", async () => {
-    const payload = { message: "hello" };
+  test("should convert markdown to html", async () => {
+    const payload = { content: "# Hello" };
 
-    const result = await executeAction("uppercase", payload);
+    const result = await executeAction("markdown_to_html", payload);
 
-    expect(result.message).toBe("HELLO");
+    expect(result.html).toContain("<h1");
+    expect(result.html).toContain("Hello");
+  });
+
+  test("should fail if content missing", async () => {
+    const payload = {};
+
+    await expect(executeAction("markdown_to_html", payload)).rejects.toThrow(
+      "content field is required for markdown_to_html action"
+    );
   });
 
   test("should add timestamp", async () => {

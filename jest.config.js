@@ -10,4 +10,9 @@ module.exports = {
   },
   modulePathIgnorePatterns: ["<rootDir>/dist/"],
   testMatch: ["<rootDir>/src/**/*.test.ts"],
+
+  transformIgnorePatterns: [
+    "node_modules/(?!(marked)/)" // transform 'marked' package too
+  ],
 };
+

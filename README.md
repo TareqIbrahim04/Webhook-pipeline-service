@@ -95,7 +95,7 @@ Example:
 {
   "name": "PIPELINE_NAME",
   "sequence": [
-    "uppercase",
+    "markdown_to_html",
     "add_timestamp",
     "shorten_url"
   ]
@@ -106,7 +106,7 @@ Supported actions:
 
 | Action | Description |
 |------|------|
-| uppercase | Converts message to uppercase, message field required |
+| markdown_to_html | Converts markdown content in the content field to HTML, stores result in html field, content field is required |
 | add_timestamp | Adds processing timestamp |
 | shorten_url | Generates a short URL for a given long URL, url field required |
 
@@ -497,6 +497,19 @@ This endpoint returns system statistics such as:
 - Retry counts
 
 ---
+
+# Shortener API
+
+Provides access to shortened URLs created by the `shorten_url` action.
+
+**Endpoint**
+
+```
+GET /s/:short_code
+```
+
+Fetches the original long URL for a given short code.  
+
 
 # Example Subscriber
 

@@ -1,12 +1,18 @@
 import crypto from "crypto";
 import { config } from "../config/env";
-
+const { marked } = require("marked");
 export async function executeAction(actionName: string, payload: any) {
   switch (actionName) {
-    case "uppercase":
-      if (payload.message) {
-        payload.message = payload.message.toUpperCase();
+    case "markdown_to_html":
+      if (!payload.content) {
+        throw new Error(
+          "content field is required for markdown_to_html action"
+        );
       }
+
+      const html = marked.parse(payload.content);
+
+      payload.html = html;
       break;
 
     case "add_timestamp":
