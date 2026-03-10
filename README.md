@@ -180,78 +180,353 @@ pending → processing → completed
 
 # API Endpoints
 
-## Create Pipeline
+This section documents all available API endpoints in the Webhook Pipeline system.
+
+Base URL (local):
 
 ```
-POST /api/pipelines
+http://localhost:3000
 ```
-
-Creates a new webhook pipeline.
 
 ---
 
-## Register Subscriber
+# Pipelines
+
+## Create Pipeline
+
+Create a new pipeline with a sequence of actions.
+
+**Endpoint**
 
 ```
-POST /api/pipelines/:pipelineId/subscribers
+POST /pipelines
 ```
 
-Registers a subscriber endpoint for a pipeline.
+**Request Body**
+
+```json
+{
+  "name": "testing",
+  "actions": ["uppercase"]
+}
+```
+
+**Example Request**
+
+```bash
+POST http://localhost:3000/pipelines
+```
+
+**Response**
+
+```json
+{
+  "id": "pipeline_id",
+  "name": "testing",
+  "actions": ["uppercase"]
+}
+```
+
+---
+
+## Get All Pipelines
+
+Returns all pipelines.
+
+**Endpoint**
+
+```
+GET /pipelines
+```
+
+---
+
+## Get Pipeline By ID
+
+Retrieve a specific pipeline.
+
+**Endpoint**
+
+```
+GET /pipelines/:pipelineId
+```
+
+Example:
+
+```
+GET /pipelines/123
+```
+
+---
+
+## Update Pipeline
+
+Updates pipeline subscribers.
+
+**Endpoint**
+
+```
+PUT /pipelines/:pipelineId
+```
+
+**Request Body**
+
+```json
+{
+  "subscribers": [
+    "http://localhost:4000/webhook"
+  ]
+}
+```
+
+**Response**
+
+Returns the updated pipeline.
+
+---
+
+## Delete Pipeline
+
+Soft deletes a pipeline.
+
+**Endpoint**
+
+```
+DELETE /pipelines/:pipelineId
+```
+
+---
+
+# Subscribers
+
+Subscribers receive processed webhook payloads.
+
+---
+
+## Create Subscriber
+
+Adds a subscriber URL to a pipeline.
+
+**Endpoint**
+
+```
+POST /pipelines/:pipelineId/subscribers
+```
+
+**Request Body**
+
+```json
+{
+  "url": "http://localhost:4000/webhook"
+}
+```
+
+**Example**
+
+```
+POST /pipelines/123/subscribers
+```
+
+---
+
+# Webhooks
+
+Webhooks trigger pipeline execution.
 
 ---
 
 ## Send Webhook
 
-```
-POST /api/webhooks/:pipelineId
-```
+Send a webhook payload to a pipeline.
 
-Receives webhook payload and queues a job.
-
----
-
-## List Jobs
+**Endpoint**
 
 ```
-GET /api/jobs
+POST /webhooks/:pipelineId
 ```
 
-Returns job history.
-
----
-
-## Delivery Attempts
+**Headers**
 
 ```
-GET /api/deliveries
+X-Webhook-Signature: <signature>
+Content-Type: application/json
 ```
 
-Returns delivery attempt records.
-
----
-
-## Metrics
-
-```
-GET /api/metrics
-```
-
-Returns system metrics.
-
-Example response:
+**Request Body**
 
 ```json
 {
-  "jobs_total": 10,
-  "jobs_completed": 8,
-  "jobs_failed": 2,
-  "delivery_attempts": 15,
-  "retry_queue_size": 1,
-  "pipelines_total": 2
+  "message": "hello world"
 }
 ```
 
 ---
+
+### Generating the Signature
+
+The webhook endpoint requires a valid signature in the header:
+
+```
+X-Webhook-Signature
+```
+
+To generate the signature, a helper script is included in the project:
+
+```
+sign.js
+```
+
+Steps:
+
+1. Open `sign.js`
+2. Replace the **pipeline secret** with your pipeline's secret
+3. Replace the **payload body** and please if you're using the sign.js
+   be aware that the playload body should be without spaces or lines 
+   example: {message:"Hello world!"}
+4. Run:
+
+```bash
+node sign.js
+```
+
+This will print the signature.
+
+Copy the generated signature and send it in the request header:
+
+```
+X-Webhook-Signature: generated_signature_here
+```
+
+This allows the server to verify that the webhook request is authentic.
+
+---
+
+# Jobs
+
+Jobs represent webhook processing tasks.
+
+---
+
+## Get All Jobs
+
+Returns all jobs.
+
+**Endpoint**
+
+```
+GET /jobs
+```
+
+---
+
+## Get Job By ID
+
+Returns a specific job.
+
+**Endpoint**
+
+```
+GET /jobs/:jobId
+```
+
+---
+
+## Get Jobs By Pipeline
+
+Returns jobs that belong to a specific pipeline.
+
+**Endpoint**
+
+```
+GET /pipelines/:pipelineId/jobs
+```
+
+---
+
+# Delivery Attempts
+
+Delivery attempts represent webhook deliveries to subscribers.
+
+---
+
+## Get Job Attempts
+
+Returns delivery attempts for a job.
+
+**Endpoint**
+
+```
+GET /jobs/:jobId/attempts
+```
+
+---
+
+## Get Job History
+
+Returns job execution history.
+
+**Endpoint**
+
+```
+GET /jobs/:jobId/history
+```
+
+---
+
+## Get All Deliveries
+
+Returns all delivery records.
+
+**Endpoint**
+
+```
+GET /deliveries
+```
+
+---
+
+# Metrics
+
+System metrics and statistics.
+
+**Endpoint**
+
+```
+GET /metrics
+```
+
+This endpoint returns system statistics such as:
+
+- Total jobs
+- Successful deliveries
+- Failed deliveries
+- Retry counts
+
+---
+
+# Example Subscriber
+
+An example webhook receiver is included in the project:
+
+```
+receiver.js
+```
+
+This script starts a simple HTTP server listening on:
+
+```
+http://localhost:4000/webhook
+```
+
+Run it with:
+
+```bash
+node receiver.js
+```
+
+When a pipeline processes a webhook, it will send the processed payload to the subscriber URL.
+
+This is useful for local testing and debugging.
 
 # Running the Project
 
