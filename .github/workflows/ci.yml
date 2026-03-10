@@ -50,7 +50,7 @@ jobs:
       - name: Setup database schema
         run: |
           sudo apt-get install -y postgresql-client
-          psql -h localhost -U postgres -d webhook_pipeline_test -f sql/init.sql
+          psql -h localhost -U postgres -d postgres -f sql/init.sql
         env:
           PGPASSWORD: postgres
 
