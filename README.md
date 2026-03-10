@@ -97,7 +97,7 @@ Example:
   "sequence": [
     "uppercase",
     "add_timestamp",
-    "multiply_value"
+    "shorten_url"
   ]
 }
 ```
@@ -106,9 +106,9 @@ Supported actions:
 
 | Action | Description |
 |------|------|
-| uppercase | Converts message to uppercase |
+| uppercase | Converts message to uppercase, message field required |
 | add_timestamp | Adds processing timestamp |
-| multiply_value | Multiplies numeric value |
+| shorten_url | Generates a short URL for a given long URL, url field required |
 
 Actions are executed sequentially by the worker.
 
@@ -181,12 +181,6 @@ pending → processing → completed
 # API Endpoints
 
 This section documents all available API endpoints in the Webhook Pipeline system.
-
-Base URL (local):
-
-```
-http://localhost:3000
-```
 
 ---
 
@@ -633,11 +627,14 @@ Once all containers are running, the API will be available at:
 http://localhost:3000
 ```
 
+You can change the port if you want in .env file we've made.
+
 Example request:
 
 ```bash
 curl http://localhost:3000/api/metrics
 ```
+NOTE: you can use postman instead.
 
 You should receive a JSON response containing system metrics.
 
