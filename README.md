@@ -535,6 +535,65 @@ When a pipeline processes a webhook, it will send the processed payload to the s
 
 This is useful for local testing and debugging.
 
+# Subscriber with ngrok
+
+When running the project with Docker, your local subscriber (receiver) cannot be accessed via `localhost`.  
+Ngrok allows exposing your local subscriber to the internet so Docker containers can reach it.
+
+---
+
+# Install ngrok
+
+## Windows
+
+1. Download ngrok from the official site: [https://ngrok.com/download](https://ngrok.com/download)  
+2. Unzip the file.  
+3. Add the folder containing `ngrok.exe` to your system `PATH`.  
+4. Verify installation:
+
+```bash
+ngrok version
+```
+
+## macOS
+
+Using Homebrew:
+```bash
+brew install ngrok/ngrok/ngrok
+```
+
+Verify installation:
+```bash
+ngrok version
+```
+
+## macOS
+
+Download the Linux binary from https://ngrok.com/download
+
+Unzip it and move it to /usr/local/bin:
+```bash
+unzip ngrok-stable-linux-amd64.zip
+sudo mv ngrok /usr/local/bin/
+```
+
+Verify installation:
+```bash
+ngrok version
+```
+
+Usage Example
+
+Start your local subscriber and expose it:
+```bash
+node receiver.js
+ngrok http 4000
+```
+
+Ngrok will give a public URL (like https://abcd1234.ngrok.io) that you can use as your subscriber endpoint.
+
+If you're using reciever.js file done forget to add /webhook and the ngrok URL.
+
 # Running the Project
 
 The recommended way to run this project is with Docker.  
