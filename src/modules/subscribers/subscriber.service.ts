@@ -6,9 +6,9 @@ export class SubscriberService {
   private pipeRepo = new PipelineRepository();
   async createSubscriber(pipelineId: string, url: string) {
     // Check pipeline exists
-    const pipelineCheck = await this.pipeRepo.getPipeline(pipelineId);
+    const pipeline = await this.pipeRepo.getPipeline(pipelineId);
 
-    if (pipelineCheck.rows.length === 0) {
+    if (!pipeline) {
       throw new Error("Pipeline not found");
     }
 
