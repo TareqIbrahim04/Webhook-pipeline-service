@@ -736,8 +736,6 @@ Possible enhancements:
 
 - Dead letter queue
 - Rate limiting
-- Webhook signature verification
-- Horizontal worker scaling
 - Observability dashboards
 - Message queue integration (Redis / Kafka)
 

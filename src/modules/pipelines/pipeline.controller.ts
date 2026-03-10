@@ -31,10 +31,6 @@ export async function getPipeline(req: Request, res: Response) {
 
     const pipeline = await service.getPipeline(pipelineId);
 
-    if (!pipeline) {
-      return res.status(404).json({ error: "pipeline not found" });
-    }
-
     res.json(pipeline);
   } catch {
     res.status(500).json({ error: "failed to fetch pipeline" });

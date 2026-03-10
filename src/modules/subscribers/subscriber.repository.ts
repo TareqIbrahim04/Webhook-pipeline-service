@@ -13,4 +13,12 @@ export class SubscriberRepository {
 
     return result.rows[0];
   }
+
+  async checkDuplicate(pipelineId: string, url: string) {
+    return await pool.query(
+      `SELECT id FROM pipeline_subscribers
+       WHERE pipeline_id = $1 AND url = $2 AND deleted_at IS NULL`,
+      [pipelineId, url]
+    );
+  }
 }
