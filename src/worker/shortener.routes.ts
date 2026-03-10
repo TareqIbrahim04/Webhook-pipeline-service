@@ -19,7 +19,7 @@ router.get("/s/:code", async (req, res) => {
 
   // ensure it has a protocol
   if (!/^https?:\/\//i.test(longUrl)) {
-    longUrl = 'http://' + longUrl;
+    longUrl = "http://" + longUrl;
   }
 
   //res.redirect(longUrl);
