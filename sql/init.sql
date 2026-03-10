@@ -1,6 +1,8 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto"; -- for gen_random_uuid()
+
 CREATE DATABASE webhook_pipeline;
 CREATE DATABASE webhook_pipeline_test;
+
 \c webhook_pipeline;
 CREATE TYPE job_status AS ENUM (
     'pending',
@@ -88,6 +90,12 @@ ADD COLUMN updated_at TIMESTAMP DEFAULT NOW();
 
 ALTER TABLE delivery_attempts
 DROP COLUMN attempt_number;
+
+CREATE TABLE url_shortener (
+  short_code TEXT PRIMARY KEY,
+  long_url TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 
 \c webhook_pipeline_test;
 
@@ -177,3 +185,9 @@ ADD COLUMN updated_at TIMESTAMP DEFAULT NOW();
 
 ALTER TABLE delivery_attempts
 DROP COLUMN attempt_number;
+
+CREATE TABLE url_shortener (
+  short_code TEXT PRIMARY KEY,
+  long_url TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);

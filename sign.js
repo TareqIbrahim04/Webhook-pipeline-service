@@ -1,8 +1,8 @@
 const crypto = require("crypto");
 
-const secret = "1f0eff17ecc6fcc81e803b287aa406a51d41e10345cc4ad7cf9f99218f844383";
+const secret = "44fea9ae8559c6111854ca408cff6227ac479a8df01e2f6a1dd50589c2317536";
 
-const payload = JSON.stringify({"message":"hello world"}); 
+const payload = JSON.stringify({"url1":"www.google.com"}); 
 // should exactly match the payload sent by the webhook sender (frontend)
 // here because we are using postman to send the webhook we need to make sure that the payload in 
 // postman without spaces and newlines matches the payload here, otherwise the signature will not match

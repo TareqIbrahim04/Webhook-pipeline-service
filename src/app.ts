@@ -6,6 +6,7 @@ import webhookRoutes from "./modules/webhooks/webhook.routes";
 import metricsRoutes from "./modules/metrics/metrics.routes";
 import deliveriesRoutes from "./modules/deliveries/delivery.routes";
 import jobRoutes from "./modules/jobs/job.routes";
+import shortenerRoutes from "./worker/shortener.routes";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use("/api", webhookRoutes);
 app.use("/api", metricsRoutes);
 app.use("/api", deliveriesRoutes);
 app.use("/api", jobRoutes);
+app.use("/", shortenerRoutes);
 
 /*
 |--------------------------------------------------------------------------

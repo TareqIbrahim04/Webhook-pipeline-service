@@ -115,7 +115,23 @@ async function executeJob(job: any) {
     const actions = pipelineResult.rows[0].actions.sequence;
 
     for (const action of actions) {
-      payload = executeAction(action, payload);
+      payload = await executeAction(action, payload);
+    }
+
+    await pool.query(
+      `UPDATE jobs SET payload = $1 WHERE id = $2`,
+      [payload, job.id]
+    );
+
+    if (payload.shortCode && payload.url) {
+      await pool.query(
+        `
+        INSERT INTO url_shortener (short_code, long_url)
+        VALUES ($1,$2)
+        ON CONFLICT DO NOTHING
+        `,
+        [payload.shortCode, payload.url]
+      );
     }
 
     await deliveryService.deliver(job.id, job.pipeline_id, payload);
@@ -134,9 +150,8 @@ async function executeJob(job: any) {
 
     console.log("Job completed:", job.id);
   } catch (error) {
-    console.error("Error processing job:", job.id, error);
     // Only fail if ACTION PROCESSING crashes
-    await pool.query(
+     await pool.query(
       `
       UPDATE jobs
       SET status = 'failed'
@@ -144,5 +159,8 @@ async function executeJob(job: any) {
       `,
       [job.id]
     );
+    throw new Error(`Error processing job: ${job.id}, Error: ${error}`);
+    
+   
   }
 }

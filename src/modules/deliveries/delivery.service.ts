@@ -3,6 +3,7 @@ import { DeliveryRepository } from "./delivery.repository";
 import { pool } from "../../config/database";
 import { calculateBackoffDelay } from "../../worker/retry.strategy";
 import { config } from "../../config/env";
+import { executeAction } from "../../worker/actions.processor";
 
 export class DeliveryService {
   private repo = new DeliveryRepository();
@@ -77,7 +78,7 @@ export class DeliveryService {
         throw new Error("Job not found");
       }
 
-      const payload = jobResult.rows[0].payload;
+      let payload = jobResult.rows[0].payload;
 
       // Retry HTTP call
       const response = await axios.post(
