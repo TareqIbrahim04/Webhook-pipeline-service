@@ -634,8 +634,8 @@ docker compose version
 # 2. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd webhook-pipeline
+git clone https://github.com/TareqIbrahim04/Webhook-pipeline-service
+cd Webhook-pipeline-service
 ```
 
 ---
@@ -664,7 +664,7 @@ Copy these inside it:
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
-DB_PASSWORD=tareqziad12345
+DB_PASSWORD=postgres
 DB_NAME=webhook_pipeline_test
 ```
 
