@@ -109,7 +109,7 @@ Supported actions:
 | markdown_to_html | Converts markdown content in the content field to HTML, stores result in html field, content field is required |
 | add_timestamp | Adds processing timestamp |
 | shorten_url | Generates a short URL for a given long URL, url field required |
-
+| generate_qr | Generates a QR URL for a given URL, url field required |
 Actions are executed sequentially by the worker.
 
 ---
@@ -201,7 +201,7 @@ POST /pipelines
 ```json
 {
   "name": "testing",
-  "actions": ["uppercase"]
+  "actions": ["shorten_url"]
 }
 ```
 
@@ -215,9 +215,18 @@ POST http://localhost:3000/pipelines
 
 ```json
 {
-  "id": "pipeline_id",
-  "name": "testing",
-  "actions": ["uppercase"]
+    "id": "ID",
+    "name": "shorten_url",
+    "source_path": "/webhooks/ID",
+    "actions": {
+        "sequence": [
+            "shorten_url"
+        ]
+    },
+    "secret": "SECRET",
+    "rate_limit_per_min": 60,
+    "deleted_at": null,
+    "created_at": "2026-03-11T14:39:33.108Z"
 }
 ```
 
@@ -255,12 +264,12 @@ GET /pipelines/123
 
 ## Update Pipeline
 
-Updates pipeline subscribers.
+Updates pipeline subscribers. (Like Real World Webhook Services)
 
 **Endpoint**
 
 ```
-PUT /pipelines/:pipelineId
+PUT /pipelines/:pipelineId/subscribers
 ```
 
 **Request Body**

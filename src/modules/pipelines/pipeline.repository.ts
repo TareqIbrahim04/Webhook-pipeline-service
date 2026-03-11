@@ -53,17 +53,24 @@ export class PipelineRepository {
   async updatePipeline(id: string, data: any) {
     const { subscribers } = data;
 
-    const result = await pool.query(
-      `
-      UPDATE pipeline_subscribers
-      SET subscribers = $1
-      WHERE id = $2 AND deleted_at IS NULL
-      RETURNING *
-      `,
-      [subscribers, id]
-    );
+    await pool.query("BEGIN");
 
-    return result.rows[0];
+    await pool.query(`
+      UPDATE pipeline_subscribers
+      SET deleted_at = NOW()
+      WHERE pipeline_id=$1
+      `, [id]);
+
+    for (const url of subscribers) {
+      await pool.query(`
+        INSERT INTO pipeline_subscribers(pipeline_id,url)
+        VALUES($1,$2)
+        `, [id, url]);
+    }
+
+    await pool.query("COMMIT");
+
+    return this.getPipeline(id);
   }
 
   async deletePipeline(id: string) {
