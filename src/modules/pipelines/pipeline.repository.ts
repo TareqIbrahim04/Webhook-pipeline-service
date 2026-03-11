@@ -55,17 +55,23 @@ export class PipelineRepository {
 
     await pool.query("BEGIN");
 
-    await pool.query(`
+    await pool.query(
+      `
       UPDATE pipeline_subscribers
       SET deleted_at = NOW()
       WHERE pipeline_id=$1
-      `, [id]);
+      `,
+      [id]
+    );
 
     for (const url of subscribers) {
-      await pool.query(`
+      await pool.query(
+        `
         INSERT INTO pipeline_subscribers(pipeline_id,url)
         VALUES($1,$2)
-        `, [id, url]);
+        `,
+        [id, url]
+      );
     }
 
     await pool.query("COMMIT");
