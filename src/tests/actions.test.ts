@@ -1,6 +1,23 @@
 import { executeAction } from "../worker/actions.processor";
 
 describe("Action Processor", () => {
+  test("should generate qr code url", async () => {
+    const payload = { url: "https://example.com" };
+
+    const result = await executeAction("generate_qr", payload);
+
+    expect(result.qrCodeUrl).toContain("api.qrserver.com");
+    expect(result.qrCodeUrl).toContain(encodeURIComponent(payload.url));
+  });
+
+  test("should fail if url missing for qr", async () => {
+    const payload = {};
+
+    await expect(
+      executeAction("generate_qr", payload)
+    ).rejects.toThrow("url field is required for generate_qr action");
+  });
+  
   test("should convert markdown to html", async () => {
     const payload = { content: "# Hello" };
 
@@ -46,7 +63,7 @@ describe("Action Processor", () => {
 
   test("should ignore unknown action", async () => {
     const payload = { message: "hello" };
-    const warnMock = jest.spyOn(console, "warn").mockImplementation(() => {});
+    const warnMock = jest.spyOn(console, "warn").mockImplementation(() => { });
 
     const result = await executeAction("unknown_action", payload);
     // console.warn called

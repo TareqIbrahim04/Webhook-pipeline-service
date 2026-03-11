@@ -34,6 +34,16 @@ export async function executeAction(actionName: string, payload: any) {
       payload.shortUrl = `http://localhost:${config.port}/s/${hash}`;
       break;
 
+    case "generate_qr":
+      if (!payload.url) {
+        throw new Error("url field is required for generate_qr action");
+      }
+
+      payload.qrCodeUrl =
+        `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload.url)}`;
+
+      break;
+
     default:
       console.warn("Unknown action:", actionName);
   }
